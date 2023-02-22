@@ -59,16 +59,18 @@ public class Customer extends BaseEntity{
 	@Column(name = "user_role", length = 30)
 	private Role userRole;
 	
+	@Column(name = "reg_date")
 	@CreationTimestamp
 	private LocalDate regDate;
 	
+	@Column(name = "is_authenticate")
 	private boolean isAuthenticate;
 	
 	
 	@OneToMany(mappedBy = "customer",cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<Review> reviews=new ArrayList<>();
 	
-	@OneToOne(mappedBy = "customer")
+	@OneToOne(mappedBy = "customer",cascade = CascadeType.ALL,orphanRemoval = true)
 	private CustomerCart cart;
 	
 	
