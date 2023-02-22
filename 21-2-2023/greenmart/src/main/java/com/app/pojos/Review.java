@@ -18,7 +18,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Review {
+public class Review extends BaseEntity{
 
 	private int rating;
 	

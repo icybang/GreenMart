@@ -23,6 +23,6 @@ import lombok.ToString;
 public class CustomerCart extends BaseEntity {
 	
   @OneToOne
-  @JoinColumn(name="cart_id",nullable = false)
+  @JoinColumn(name="cust_id",nullable = false)
   private Customer customer;
 }

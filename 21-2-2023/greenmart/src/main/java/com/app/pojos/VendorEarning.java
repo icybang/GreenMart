@@ -23,7 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class VendorEarning {
+public class VendorEarning extends BaseEntity{
 	@CreationTimestamp
 	private LocalDate date;
 
