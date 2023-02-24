@@ -28,34 +28,33 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Admin extends BaseEntity {
-	
-	@Length(min=4,max=20,message = "Invalid or Blank first name!!!!!!")
-    @Column(name = "first_name", length = 20) 
-    private String firstName;
 
-    @Column(name = "last_name", length = 20) 
-    @NotBlank(message = "Last name can't be blank")
-    private String lastName;
-	
-    @Pattern(regexp="^(.+)@(\\S+)$", message="Please provide a valid email address")
-    @Column(length = 30, unique = true)
-    private String email;
+	@Length(min = 4, max = 20, message = "Invalid or Blank first name!!!!!!")
+	@Column(name = "first_name", length = 20)
+	private String firstName;
 
-    @Pattern(regexp = "((?=.\\d)(?=.[a-z])(?=.[#@$]).{5,20})", message = "Blank or Invalid password")
-    @Column(length = 20, nullable = false)
-    private String password;
+	@Column(name = "last_name", length = 20)
+	@NotBlank(message = "Last name can't be blank")
+	private String lastName;
 
-    @Column(name= "mob_no",length = 10)
-    private String mobNo;
-	
+	@Pattern(regexp = "^(.+)@(\\S+)$", message = "Please provide a valid email address")
+	@Column(length = 30, unique = true)
+	private String email;
+
+	@Pattern(regexp = "((?=.\\d)(?=.[a-z])(?=.[#@$]).{5,20})", message = "Blank or Invalid password")
+	@Column(length = 20, nullable = false)
+	private String password;
+
+	@Column(name = "mob_no", length = 10)
+	private String mobNo;
+
 	@CreationTimestamp
 	@Column(name = "reg_date")
 	private LocalDate regDate;
-	
+
 	@Column(name = "is_authenticate")
 	private boolean isAuthenticate;
 
 	@OneToMany(mappedBy = "admin")
 	private List<Vendor> vendors = new ArrayList<Vendor>();
 }
-

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.dto.ApiResponse;
+import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
 import com.app.dto.LoginRequest;
 import com.app.dto.ProductDto;
@@ -69,7 +70,7 @@ public class CutomerController {
 		return ResponseEntity.ok(this.customerService.getAllProducts());
 	}
 
-	// PUT - add product to cart
+	// PUT - add product to cartitems
 
 	@PutMapping("/cart/{customerId}/prodId/{prodId}/qty/{qty}")
 	public ResponseEntity<ApiResponse> addProductToCart(@PathVariable Long prodId, @PathVariable Long customerId,
@@ -78,6 +79,39 @@ public class CutomerController {
 		return new ResponseEntity<ApiResponse>(new ApiResponse("customer added product in cart Successfully!!", true),
 				HttpStatus.OK);
 
+	}
+
+	// Get - view cart
+	@GetMapping("/cart/{customerId}")
+	public ResponseEntity<List<CartItemsDto>> showCustomerCart(@PathVariable Long customerId) {
+		return ResponseEntity.ok(this.customerService.getCustomerCart(customerId));
+	}
+
+	// PUT - update cart
+	@PutMapping("/cart/{cartItemId}/qty/{qty}")
+	public ResponseEntity<ApiResponse> updateCustomerCart(@PathVariable Long cartItemId, @PathVariable Integer qty) {
+		this.customerService.updateCustomerCart(cartItemId, qty);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("customer cart updated  Successfully!!", true),
+				HttpStatus.OK);
+
+	}
+
+	// GET - getProduct by category
+	@GetMapping("/product/{categoryId}")
+	public ResponseEntity<List<ProductDto>> getProductByCategory(@PathVariable Long categoryId) {
+		return ResponseEntity.ok(this.customerService.getProduct(categoryId));
+	}
+
+	// GET - getProduct by rate
+	@GetMapping("/product/rate/{rate}")
+	public ResponseEntity<List<ProductDto>> getProductByCategory(@PathVariable double rate) {
+		return ResponseEntity.ok(this.customerService.getProduct(rate));
+	}
+
+	// GET - getProduct by rate
+	@GetMapping("/product/name/{name}")
+	public ResponseEntity<List<ProductDto>> getProductByName(@PathVariable String name) {
+		return ResponseEntity.ok(this.customerService.getProductByName(name));
 	}
 
 }

@@ -8,14 +8,18 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
 import com.app.dto.LoginResponse;
 import com.app.dto.ProductDto;
 import com.app.exceptions.ResourceNotFoundException;
 import com.app.pojos.CartItems;
+import com.app.pojos.Category;
 import com.app.pojos.Customer;
+import com.app.pojos.CustomerCart;
 import com.app.pojos.Product;
 import com.app.repository.CartItemRepo;
+import com.app.repository.CategoryRepo;
 import com.app.repository.CustomerCartRepo;
 import com.app.repository.CustomerRepo;
 import com.app.repository.ProductRepo;
@@ -35,6 +39,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private CartItemRepo cartItemepo;
+
+	@Autowired
+	private CategoryRepo categoryRepo;
 
 	@Override
 	public LoginResponse authenticateCustomer(String email, String pwd) {
@@ -158,6 +165,63 @@ public class CustomerServiceImpl implements CustomerService {
 		cartItem.setQty(qty);
 		this.cartItemepo.save(cartItem);
 		return this.ProductTodto(product);
+	}
+
+	@Override
+	public List<CartItemsDto> getCustomerCart(Long customerId) {
+		Customer customer = this.customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+
+		CustomerCart cart = customer.getCart();
+
+		List<CartItems> cartItems = cart.getCartItems();
+		List<CartItemsDto> cartItemsDtos = cartItems.stream().map(c -> this.cartItemsToCartItemsDto(c))
+				.collect(Collectors.toList());
+		return cartItemsDtos;
+	}
+
+	private CartItemsDto cartItemsToCartItemsDto(CartItems cartItems) {
+		CartItemsDto cartItemsDto = new CartItemsDto();
+		cartItemsDto.setProduct(cartItems.getProduct());
+		cartItemsDto.setQty(cartItems.getQty());
+		return cartItemsDto;
+	}
+
+	@Override
+	public void updateCustomerCart(Long cartId, Integer qty) {
+		if (qty == 0) {
+			cartItemepo.delete(cartItemepo.findById(cartId)
+					.orElseThrow(() -> new ResourceNotFoundException("Cart", " id ", cartId)));
+		} else {
+			CartItems cartItems = cartItemepo.findById(cartId)
+					.orElseThrow(() -> new ResourceNotFoundException("Cart", " id ", cartId));
+			cartItems.setQty(qty);
+		}
+
+	}
+
+	@Override
+	public List<ProductDto> getProduct(Long categoryId) {
+		Category category = this.categoryRepo.findById(categoryId)
+				.orElseThrow(() -> new ResourceNotFoundException("category", " id ", categoryId));
+		List<Product> products = this.productRepo.findByCategory(category);
+		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p)).collect(Collectors.toList());
+		return productDtos;
+	}
+
+	@Override
+	public List<ProductDto> getProduct(double rate) {
+		List<Product> products = this.productRepo.findByRate(rate);
+		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p)).collect(Collectors.toList());
+		return productDtos;
+	}
+
+	@Override
+	public List<ProductDto> getProductByName(String name) {
+		List<Product> products = this.productRepo.findByProductName(name);
+		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p)).collect(Collectors.toList());
+		return productDtos;
+
 	}
 
 }
