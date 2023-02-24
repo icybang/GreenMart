@@ -13,23 +13,21 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name="cart_items")
+@Table(name = "cart_items")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CartItems extends BaseEntity{
-	
-	@JoinColumn(name="cart_id" , nullable = false)
+public class CartItems extends BaseEntity {
+
+	@JoinColumn(name = "cart_id", nullable = false)
 	@ManyToOne
 	private CustomerCart cart;
-	
-	
-	@JoinColumn(name="prod_id" , nullable = false)
+
+	@JoinColumn(name = "prod_id", nullable = false)
 	@OneToOne
-	private Product product ;
-	
-	
-	private int qty ;
+	private Product product;
+
+	private int qty;
 }

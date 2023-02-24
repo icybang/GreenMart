@@ -33,9 +33,11 @@ public class ProductDto extends BaseEntity{
 		private int productQuantity;
 		
 		private double averageRating;
+		
+		private boolean isAvailable;
 
 		public ProductDto(String productName, double rate, int discount, String productDescription, String image,
-				LocalDate expiryDate, int productQuantity, double averageRating) {
+				LocalDate expiryDate, int productQuantity, double averageRating, boolean isAvailable) {
 			super();
 			this.productName = productName;
 			this.rate = rate;
@@ -45,6 +47,9 @@ public class ProductDto extends BaseEntity{
 			this.expiryDate = expiryDate;
 			this.productQuantity = productQuantity;
 			this.averageRating = averageRating;
+			this.isAvailable = isAvailable;
 		}
+
+	
 		
 }
