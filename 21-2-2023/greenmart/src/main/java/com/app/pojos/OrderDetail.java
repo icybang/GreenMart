@@ -19,17 +19,21 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class OrderDetail extends BaseEntity{
+public class OrderDetail extends BaseEntity {
 
-	@Column(name="qty")
+	@Column(name = "qty")
 	private int quantity;
-	
+
 	@ManyToOne
-	@JoinColumn(name="order_id",nullable = false)
+	@JoinColumn(name = "order_id", nullable = false)
 	private Order order;
-	
+
 	@ManyToOne
-	@JoinColumn(name="prod_id",nullable = false)
+	@JoinColumn(name = "prod_id", nullable = false)
 	private Product product;
-	
+
+	@ManyToOne
+	@JoinColumn(name = "vend_id", nullable = false)
+	private Vendor vendor;
+
 }

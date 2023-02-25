@@ -5,6 +5,8 @@ import java.util.List;
 import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
 import com.app.dto.LoginResponse;
+import com.app.dto.OrderDetailsDto;
+import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
 
 public interface CustomerService {
@@ -12,6 +14,8 @@ public interface CustomerService {
 	LoginResponse authenticateCustomer(String email, String pwd);
 
 	CustomerDto updateCustomer(CustomerDto customerDto, Long CustomerId);
+
+	void updateCustomerPassword(CustomerDto customerDto, Long CustomerId);
 
 	void deleteCustomer(Long customerId);
 
@@ -32,4 +36,18 @@ public interface CustomerService {
 	List<ProductDto> getProduct(double rate);
 
 	List<ProductDto> getProductByName(String name);
+
+	List<ProductDto> getProductByReview();
+
+	void writeReviewByProductId(Long customerId, Long productId, Integer rating);
+
+	boolean addOrder(List<OrderDetailsDto> orderDetails, Long customerId, Integer modeOfPayment);
+
+	List<OrderDto> getOrders(Long customerId);
+
+	List<OrderDetailsDto> getOrdersDetails(Long orderId);
+
+	List<OrderDto> getCancelOrders(Long customerId);
+
+	boolean registerCustomer(CustomerDto customerDto);
 }

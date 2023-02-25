@@ -18,6 +18,8 @@ import com.app.dto.ApiResponse;
 import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
 import com.app.dto.LoginRequest;
+import com.app.dto.OrderDetailsDto;
+import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
 import com.app.service.CustomerService;
 
@@ -38,12 +40,32 @@ public class CutomerController {
 		return ResponseEntity.ok(customerService.authenticateCustomer(request.getEmail(), request.getPassword()));
 	}
 
+	@PostMapping("/register")
+	public ResponseEntity<ApiResponse> registerCustomer(@RequestBody CustomerDto customerDto) {
+		boolean success = this.customerService.registerCustomer(customerDto);
+		if (success) {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("customer registered successfully!!", true),
+					HttpStatus.OK);
+		} else {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("customer registered Unsuccessfully!!", true),
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+	}
+
 	// PUT - update customer
 	@PutMapping("/{customerId}")
 	public ResponseEntity<CustomerDto> updateCustomer(@RequestBody CustomerDto customerDto,
 			@PathVariable Long customerId) {
 		CustomerDto updatedCustomer = this.customerService.updateCustomer(customerDto, customerId);
 		return ResponseEntity.ok(updatedCustomer);
+	}
+
+	// PUT - change password
+	@PutMapping("/password/{customerId}")
+	public ResponseEntity<ApiResponse> updateCustomerPassword(@RequestBody CustomerDto customerDto,
+			@PathVariable Long customerId) {
+		this.customerService.updateCustomerPassword(customerDto, customerId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("password changed Successfully!!", true), HttpStatus.OK);
 	}
 
 	// DELETE - delete customer
@@ -114,4 +136,51 @@ public class CutomerController {
 		return ResponseEntity.ok(this.customerService.getProductByName(name));
 	}
 
+	// Get - get product by review ( sort by review )
+	@GetMapping("/product/review")
+	public ResponseEntity<List<ProductDto>> getProductByReview() {
+		return ResponseEntity.ok(this.customerService.getProductByReview());
+	}
+
+	// put - write review by product Id ( give rating to Product)
+	@PutMapping("/product/review/{customerId}/product/{productId}/rating/{rating}")
+	public ResponseEntity<ApiResponse> writeReviewByProductId(@PathVariable Long customerId,
+			@PathVariable Long productId, @PathVariable Integer rating) {
+		this.customerService.writeReviewByProductId(customerId, productId, rating);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("rating added  Successfully!!", true), HttpStatus.OK);
+	}
+
+	// Put - place an order
+	@PutMapping("/order/{customerId}/mode/{modeOfPayment}")
+	public ResponseEntity<ApiResponse> placeAnOrder(@RequestBody List<OrderDetailsDto> orderDetails,
+			@PathVariable Long customerId, @PathVariable Integer modeOfPayment) {
+
+		boolean success = this.customerService.addOrder(orderDetails, customerId, modeOfPayment);
+		if (success) {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Order placed  Successfully!!", true),
+					HttpStatus.OK);
+		} else {
+			return new ResponseEntity<ApiResponse>(new ApiResponse("Order placed  unsuccessfull!!", true),
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
+	}
+
+	// GET - get order status ( get Order)
+	@GetMapping("/order/{customerId}")
+	public ResponseEntity<List<OrderDto>> getOrderStatus(@PathVariable Long customerId) {
+		return ResponseEntity.ok(this.customerService.getOrders(customerId));
+	}
+
+	// GET - get order details ( get Order)
+	@GetMapping("/orderdetails/{orderId}")
+	public ResponseEntity<List<OrderDetailsDto>> getOrderDetails(@PathVariable Long orderId) {
+		return ResponseEntity.ok(this.customerService.getOrdersDetails(orderId));
+	}
+
+	// GET - get cancelled order
+	@GetMapping("/cancelorder/{customerId}")
+	public ResponseEntity<List<OrderDto>> getCancelOrders(@PathVariable Long customerId) {
+		return ResponseEntity.ok(this.customerService.getCancelOrders(customerId));
+	}
 }

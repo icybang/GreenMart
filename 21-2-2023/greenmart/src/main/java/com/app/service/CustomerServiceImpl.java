@@ -1,28 +1,45 @@
 package com.app.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
 import com.app.dto.LoginResponse;
+import com.app.dto.OrderDetailsDto;
+import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
 import com.app.exceptions.ResourceNotFoundException;
 import com.app.pojos.CartItems;
 import com.app.pojos.Category;
 import com.app.pojos.Customer;
 import com.app.pojos.CustomerCart;
+import com.app.pojos.ModeOfPayment;
+import com.app.pojos.Order;
+import com.app.pojos.OrderDetail;
+import com.app.pojos.OrderStatus;
 import com.app.pojos.Product;
+import com.app.pojos.Review;
+import com.app.pojos.Role;
+import com.app.pojos.Vendor;
 import com.app.repository.CartItemRepo;
 import com.app.repository.CategoryRepo;
 import com.app.repository.CustomerCartRepo;
 import com.app.repository.CustomerRepo;
+import com.app.repository.OrderDetailsRepo;
+import com.app.repository.OrderRepo;
 import com.app.repository.ProductRepo;
+import com.app.repository.ReviewRepo;
+import com.app.repository.VendorRepo;
 
 @Service
 @Transactional
@@ -43,6 +60,21 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private CategoryRepo categoryRepo;
 
+	@Autowired
+	private ReviewRepo reviewRepo;
+
+	@Autowired
+	private OrderRepo orderRepo;
+
+	@Autowired
+	private OrderDetailsRepo orderDetailsRepo;
+
+	@Autowired
+	private ModelMapper modelMapper;
+
+	@Autowired
+	private VendorRepo vendorRepo;
+
 	@Override
 	public LoginResponse authenticateCustomer(String email, String pwd) {
 
@@ -62,6 +94,14 @@ public class CustomerServiceImpl implements CustomerService {
 		customerToBeUpdated.setMobNo(customerDto.getMobNo());
 
 		return this.customerToCustomerDto(customerToBeUpdated);
+	}
+
+	@Override
+	public void updateCustomerPassword(CustomerDto customerDto, Long customerId) {
+		Customer customerToBeUpdated = this.customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+		customerToBeUpdated.setPassword(customerDto.getPassword());
+
 	}
 
 	private Customer dtoToCustomer(CustomerDto customerDto) {
@@ -117,7 +157,8 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public List<ProductDto> getAllProducts() {
 		List<Product> products = productRepo.findAll();
-		List<ProductDto> productdtos = products.stream().map(p -> this.ProductTodto(p)).collect(Collectors.toList());
+		List<ProductDto> productdtos = products.stream().map(p -> this.ProductTodto(p))
+				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
 		return productdtos;
 	}
 
@@ -205,23 +246,172 @@ public class CustomerServiceImpl implements CustomerService {
 		Category category = this.categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("category", " id ", categoryId));
 		List<Product> products = this.productRepo.findByCategory(category);
-		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p)).collect(Collectors.toList());
+		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p))
+				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
 		return productDtos;
 	}
 
 	@Override
 	public List<ProductDto> getProduct(double rate) {
 		List<Product> products = this.productRepo.findByRate(rate);
-		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p)).collect(Collectors.toList());
+		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p))
+				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
 		return productDtos;
 	}
 
 	@Override
 	public List<ProductDto> getProductByName(String name) {
 		List<Product> products = this.productRepo.findByProductName(name);
-		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p)).collect(Collectors.toList());
+		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p))
+				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
 		return productDtos;
 
+	}
+
+	@Override
+	public List<ProductDto> getProductByReview() {
+		List<Product> products = this.productRepo.findAll();
+		products = products.stream().sorted(Comparator.comparingDouble(Product::getAverageRating).reversed())
+				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
+		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p))
+				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
+		return productDtos;
+	}
+
+	@Override
+	public void writeReviewByProductId(Long customerId, Long productId, Integer rating) {
+		Customer customer = this.customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+		Product product = this.productRepo.findById(productId)
+				.orElseThrow(() -> new ResourceNotFoundException("Product", " id ", productId));
+		Review review = new Review();
+		review.setCustomer(customer);
+		review.setProduct(product);
+		review.setRating(rating);
+
+		this.reviewRepo.save(review);
+	}
+
+	@Override
+	public boolean addOrder(List<OrderDetailsDto> orderDetailDtos, Long customerId, Integer modeOfPayment) {
+
+		for (int i = 0; i < orderDetailDtos.size(); i++) {
+			Long productId = orderDetailDtos.get(i).getProduct().getId();
+			Long vendorId = orderDetailDtos.get(i).getVendor().getId();
+			Product product = this.productRepo.findById(productId)
+					.orElseThrow(() -> new ResourceNotFoundException("Product", " id ", productId));
+			Vendor vendor = this.vendorRepo.findById(vendorId)
+					.orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", vendorId));
+			int productQuantity = product.getProductQuantity() - orderDetailDtos.get(i).getQuantity();
+			if (productQuantity <= 0) {
+				return false;
+			} else {
+				product.setProductQuantity(productQuantity);
+				productRepo.save(product);
+			}
+		}
+
+		Customer customer = this.customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+
+		Order order = new Order();
+
+		order.setCustomer(customer);
+		if (modeOfPayment == 0) {
+			order.setModeOfPayment(ModeOfPayment.CASH);
+		} else if (modeOfPayment == 1) {
+			order.setModeOfPayment(ModeOfPayment.CREDITCARD);
+		} else if (modeOfPayment == 2) {
+			order.setModeOfPayment(ModeOfPayment.DEBITCARD);
+		} else if (modeOfPayment == 3) {
+			order.setModeOfPayment(ModeOfPayment.UPI);
+		} else {
+			order.setModeOfPayment(ModeOfPayment.CASH);
+		}
+		order.setOrderDate(LocalDate.now());
+
+		LocalDateTime localDatetime = LocalDateTime.now().plusHours(6);
+		order.setDeliveryDate(localDatetime.toLocalDate());
+
+		order.setOrderStatus(OrderStatus.PENDING);
+
+		this.orderRepo.save(order);
+
+		for (int i = 0; i < orderDetailDtos.size(); i++) {
+			OrderDetail orderDetails = this.orderDetailDtoToOrderDetails(orderDetailDtos.get(i));
+			orderDetails.setOrder(order);
+			this.orderDetailsRepo.save(orderDetails);
+		}
+		return true;
+
+	}
+
+	private Order orderDtoToOrder(OrderDto orderDto) {
+		return this.modelMapper.map(orderDto, Order.class);
+	}
+
+	private OrderDto orderToOrderDto(Order order) {
+		return this.modelMapper.map(order, OrderDto.class);
+	}
+
+	private OrderDetail orderDetailDtoToOrderDetails(OrderDetailsDto orderDetailsDto) {
+		return this.modelMapper.map(orderDetailsDto, OrderDetail.class);
+	}
+
+	private OrderDetailsDto orderDetailToOrderDetailsDto(OrderDetail orderDetail) {
+		return this.modelMapper.map(orderDetail, OrderDetailsDto.class);
+	}
+
+	@Override
+	public List<OrderDto> getOrders(Long customerId) {
+		Customer customer = this.customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+
+		List<Order> orders = this.orderRepo.findByCustomer(customer);
+		orders = orders.stream().filter(
+				o -> (o.getOrderStatus() == OrderStatus.PENDING) || (o.getOrderStatus() == OrderStatus.DELIVERED))
+				.collect(Collectors.toList());
+
+		List<OrderDto> orderDtos = orders.stream().map(o -> this.orderToOrderDto(o)).collect(Collectors.toList());
+
+		return orderDtos;
+	}
+
+	@Override
+	public List<OrderDetailsDto> getOrdersDetails(Long orderId) {
+		Order order = this.orderRepo.findById(orderId)
+				.orElseThrow(() -> new ResourceNotFoundException("Order", " id ", orderId));
+		List<OrderDetail> orderDetails = this.orderDetailsRepo.findByOrder(order);
+		List<OrderDetailsDto> orderdDetails = orderDetails.stream().map(o -> this.orderDetailToOrderDetailsDto(o))
+				.collect(Collectors.toList());
+		return orderdDetails;
+	}
+
+	@Override
+	public List<OrderDto> getCancelOrders(Long customerId) {
+		Customer customer = this.customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+
+		List<Order> orders = this.orderRepo.findByCustomer(customer);
+		orders = orders.stream().filter(o -> o.getOrderStatus() == OrderStatus.CANCELLED).collect(Collectors.toList());
+
+		List<OrderDto> orderDtos = orders.stream().map(o -> this.orderToOrderDto(o)).collect(Collectors.toList());
+
+		return orderDtos;
+	}
+
+	@Override
+	public boolean registerCustomer(CustomerDto customerDto) {
+		Customer newCustomer = modelMapper.map(customerDto, Customer.class);
+		CustomerCart customerCart = new CustomerCart();
+		customerCart.setCustomer(newCustomer);
+		newCustomer.setAuthenticate(true);
+		newCustomer.setUserRole(Role.CUSTOMER);
+
+		this.customerRepo.save(newCustomer);
+		this.cartRepo.save(customerCart);
+
+		return true;
 	}
 
 }
