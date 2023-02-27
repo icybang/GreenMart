@@ -1,5 +1,6 @@
 package com.app.dto;
 
+import com.app.pojos.BaseEntity;
 import com.app.pojos.Product;
 import com.app.pojos.Vendor;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,7 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class OrderDetailsDto {
+public class OrderDetailsDto extends BaseEntity {
 
 	private int quantity;
 

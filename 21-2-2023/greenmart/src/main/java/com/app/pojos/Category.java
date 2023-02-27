@@ -12,17 +12,16 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Category extends BaseEntity{
+public class Category extends BaseEntity {
 
-
-    @Column(name = "cat_name", length = 30)
-    @NotBlank(message = "Category name can't be blank")
-    private String categoryName;
+	@Column(name = "cat_name", length = 30)
+	@NotBlank(message = "Category name can't be blank")
+	private String categoryName;
 
 }

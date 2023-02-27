@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
@@ -29,19 +28,22 @@ import lombok.ToString;
 @AllArgsConstructor
 public class Admin extends BaseEntity {
 
-	@Length(min = 4, max = 20, message = "Invalid or Blank first name!!!!!!")
+	@Length(min = 4, max = 20, message = "message length min= 4 max 20 !!!!!!")
 	@Column(name = "first_name", length = 20)
+	@NotBlank(message = "First name can't be blank")
 	private String firstName;
 
 	@Column(name = "last_name", length = 20)
 	@NotBlank(message = "Last name can't be blank")
 	private String lastName;
 
-	@Pattern(regexp = "^(.+)@(\\S+)$", message = "Please provide a valid email address")
+	// @Pattern(regexp = "^(.+)@(\\S+)$", message = "Please provide a valid email
+	// address")
 	@Column(length = 30, unique = true)
 	private String email;
 
-	@Pattern(regexp = "((?=.\\d)(?=.[a-z])(?=.[#@$]).{5,20})", message = "Blank or Invalid password")
+	// @Pattern(regexp = "((?=.\\d)(?=.[a-z])(?=.[#@$]).{5,20})", message = "Blank
+	// or Invalid password")
 	@Column(length = 20, nullable = false)
 	private String password;
 

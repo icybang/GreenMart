@@ -14,7 +14,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.validator.constraints.Length;
@@ -42,11 +41,13 @@ public class Customer extends BaseEntity {
 	@NotBlank(message = "Last  name can't be blank")
 	private String lastName;
 
-	@Pattern(regexp = "^(.+)@(\\S+)$", message = "Please provide a valid email address")
+	// @Pattern(regexp = "^(.+)@(\\S+)$", message = "Please provide a valid email
+	// address")
 	@Column(length = 30, unique = true)
 	private String email;
 
-	@Pattern(regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[#@$*]).{5,20})", message = "Blank or Invalid password")
+	// @Pattern(regexp = "((?=.*\\d)(?=.*[a-z])(?=.*[#@$*]).{5,20})", message =
+	// "Blank or Invalid password")
 	@Column(length = 20, nullable = false)
 	private String password;
 

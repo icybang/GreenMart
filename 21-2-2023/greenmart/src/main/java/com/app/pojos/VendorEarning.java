@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,21 +17,21 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "vendor_earning")
+@Table(name = "vendor_earnings")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class VendorEarning extends BaseEntity{
+public class VendorEarning extends BaseEntity {
 	@CreationTimestamp
 	private LocalDate date;
 
 	@Column(precision = 10, scale = 2)
 	private double amount;
 
-	@OneToOne
-	@JoinColumn(name = "vendor_id")
+	@ManyToOne
+	@JoinColumn(name = "vendor_id", nullable = false)
 	private Vendor vendor;
 
 }

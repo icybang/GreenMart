@@ -2,6 +2,7 @@ package com.app.dto;
 
 import java.time.LocalDate;
 
+import com.app.pojos.BaseEntity;
 import com.app.pojos.Customer;
 import com.app.pojos.ModeOfPayment;
 import com.app.pojos.OrderStatus;
@@ -18,7 +19,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class OrderDto {
+public class OrderDto extends BaseEntity {
 
 	private LocalDate orderDate;
 
@@ -30,4 +31,13 @@ public class OrderDto {
 
 	@JsonIgnore
 	private Customer customer;
+
+	public OrderDto(LocalDate orderDate, LocalDate deliveryDate, OrderStatus orderStatus, ModeOfPayment modeOfPayment) {
+		super();
+		this.orderDate = orderDate;
+		this.deliveryDate = deliveryDate;
+		this.orderStatus = orderStatus;
+		this.modeOfPayment = modeOfPayment;
+	}
+
 }
