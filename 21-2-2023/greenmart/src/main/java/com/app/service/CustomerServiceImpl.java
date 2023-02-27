@@ -414,4 +414,22 @@ public class CustomerServiceImpl implements CustomerService {
 		return true;
 	}
 
+	@Override
+	public void cancelOrder(Long customerId, Long orderId) {
+		Customer customer = this.customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+		Order order = this.orderRepo.findById(orderId)
+				.orElseThrow(() -> new ResourceNotFoundException("Order", " id ", orderId));
+		List<OrderDetail> orderDetails = this.orderDetailsRepo.findByOrder(order);
+		for (int i = 0; i < orderDetails.size(); i++) {
+			Product product = orderDetails.get(i).getProduct();
+			int prevQuantity = product.getProductQuantity() + orderDetails.get(i).getQuantity();
+			product.setProductQuantity(prevQuantity);
+			this.productRepo.save(product);
+			this.orderDetailsRepo.delete(orderDetails.get(i));
+		}
+		order.setOrderStatus(OrderStatus.CANCELLED);
+
+	}
+
 }

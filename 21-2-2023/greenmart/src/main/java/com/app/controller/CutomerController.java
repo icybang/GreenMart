@@ -81,6 +81,7 @@ public class CutomerController {
 		return ResponseEntity.ok(this.customerService.getAllUsers());
 	}
 
+	// GET get customer by ID
 	@GetMapping("/{customerId}")
 	public ResponseEntity<CustomerDto> getUserById(@PathVariable Long customerId) {
 		return ResponseEntity.ok(this.customerService.getCustomerById(customerId));
@@ -182,5 +183,12 @@ public class CutomerController {
 	@GetMapping("/cancelorder/{customerId}")
 	public ResponseEntity<List<OrderDto>> getCancelOrders(@PathVariable Long customerId) {
 		return ResponseEntity.ok(this.customerService.getCancelOrders(customerId));
+	}
+
+	// PUT - cancel order
+	@PutMapping("/cancelorder/{customerId}/orderid/{orderId}")
+	public ResponseEntity<ApiResponse> cancelOrder(@PathVariable Long customerId, @PathVariable Long orderId) {
+		this.customerService.cancelOrder(customerId, orderId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("Order cancelled  Successfully!!", true), HttpStatus.OK);
 	}
 }

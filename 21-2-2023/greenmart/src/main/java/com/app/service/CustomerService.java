@@ -50,4 +50,6 @@ public interface CustomerService {
 	List<OrderDto> getCancelOrders(Long customerId);
 
 	boolean registerCustomer(CustomerDto customerDto);
+
+	void cancelOrder(Long customerId, Long orderId);
 }
