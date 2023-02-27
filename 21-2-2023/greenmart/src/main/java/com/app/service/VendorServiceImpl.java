@@ -12,12 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.app.dto.ProductDto;
 import com.app.dto.VendorDto;
 import com.app.exceptions.ResourceNotFoundException;
+import com.app.exceptions.UsernameNotFoundException;
+import com.app.pojos.AppUser;
 import com.app.pojos.Category;
 import com.app.pojos.Product;
 import com.app.pojos.Role;
 import com.app.pojos.Vendor;
 import com.app.pojos.VendorEarning;
 import com.app.repository.AdminRepository;
+import com.app.repository.AppUserRepo;
 import com.app.repository.CategoryRepo;
 import com.app.repository.ProductRepo;
 import com.app.repository.VendorEarningRepository;
@@ -45,6 +48,9 @@ public class VendorServiceImpl implements VendorService {
 	@Autowired
 	private VendorEarningRepository vendorEarningRepo;
 
+	@Autowired
+	private AppUserRepo appUserRepo;
+
 	@Override
 	public void addVendor(VendorDto venDto) {
 		Vendor vendor = modelMapper.map(venDto, Vendor.class);
@@ -54,6 +60,15 @@ public class VendorServiceImpl implements VendorService {
 				adminRepo.findById((long) 1).orElseThrow(() -> new ResourceNotFoundException("admin", " id ", 1)));
 		vendor.setUserRole(Role.VENDOR);
 		vendRepo.save(vendor);
+		String role = Role.VENDOR.name();
+
+		AppUser appUser = new AppUser();
+
+		appUser.setEmail(vendor.getEmail());
+		appUser.setPassword(vendor.getPassword());
+		appUser.setRole(role);
+
+		this.appUserRepo.save(appUser);
 	}
 
 	@Override
@@ -81,6 +96,10 @@ public class VendorServiceImpl implements VendorService {
 		Vendor vendor = vendRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", id));
 		vendor.setAuthenticate(false);
 		vendRepo.save(vendor);
+		AppUser appUser = this.appUserRepo.findByEmail(vendor.getEmail())
+				.orElseThrow(() -> new UsernameNotFoundException(" email "));
+
+		appUserRepo.delete(appUser);
 	}
 
 	@Override

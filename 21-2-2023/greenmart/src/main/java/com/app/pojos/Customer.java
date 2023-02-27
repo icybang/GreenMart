@@ -66,7 +66,7 @@ public class Customer extends BaseEntity {
 	private LocalDate regDate;
 
 	@Column(name = "is_authenticate")
-	private boolean isAuthenticate;
+	private boolean Authenticated;
 
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Review> reviews = new ArrayList<>();

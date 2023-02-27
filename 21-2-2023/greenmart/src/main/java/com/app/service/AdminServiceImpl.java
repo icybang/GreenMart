@@ -175,7 +175,7 @@ public class AdminServiceImpl implements AdminService {
 	public void removeCustomer(Long id) {
 		Customer customer = custRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", id));
-		customer.setAuthenticate(false);
+		customer.setAuthenticated(false);
 		custRepo.save(customer);
 	}
 

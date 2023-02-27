@@ -19,6 +19,8 @@ import com.app.dto.OrderDetailsDto;
 import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
 import com.app.exceptions.ResourceNotFoundException;
+import com.app.exceptions.UsernameNotFoundException;
+import com.app.pojos.AppUser;
 import com.app.pojos.CartItems;
 import com.app.pojos.Category;
 import com.app.pojos.Customer;
@@ -31,6 +33,7 @@ import com.app.pojos.Product;
 import com.app.pojos.Review;
 import com.app.pojos.Role;
 import com.app.pojos.Vendor;
+import com.app.repository.AppUserRepo;
 import com.app.repository.CartItemRepo;
 import com.app.repository.CategoryRepo;
 import com.app.repository.CustomerCartRepo;
@@ -74,6 +77,9 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Autowired
 	private VendorRepo vendorRepo;
+
+	@Autowired
+	private AppUserRepo appUserRepo;
 
 	@Override
 	public LoginResponse authenticateCustomer(String email, String pwd) {
@@ -133,7 +139,12 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customerToBeDeleted = this.customerRepo.findById(customerId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
 
-		this.customerRepo.delete(customerToBeDeleted);
+		customerToBeDeleted.setAuthenticated(false);
+
+		AppUser appUser = this.appUserRepo.findByEmail(customerToBeDeleted.getEmail())
+				.orElseThrow(() -> new UsernameNotFoundException(" email "));
+
+		appUserRepo.delete(appUser);
 
 	}
 
@@ -405,8 +416,18 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer newCustomer = modelMapper.map(customerDto, Customer.class);
 		CustomerCart customerCart = new CustomerCart();
 		customerCart.setCustomer(newCustomer);
-		newCustomer.setAuthenticate(true);
+		newCustomer.setAuthenticated(true);
 		newCustomer.setUserRole(Role.CUSTOMER);
+
+		String role = Role.CUSTOMER.name();
+
+		AppUser appUser = new AppUser();
+
+		appUser.setEmail(newCustomer.getEmail());
+		appUser.setPassword(newCustomer.getPassword());
+		appUser.setRole(role);
+
+		this.appUserRepo.save(appUser);
 
 		this.customerRepo.save(newCustomer);
 		this.cartRepo.save(customerCart);
