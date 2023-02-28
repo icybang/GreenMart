@@ -7,6 +7,8 @@ import com.app.pojos.Customer;
 import com.app.pojos.ModeOfPayment;
 import com.app.pojos.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +21,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@JsonInclude(Include.NON_EMPTY)
 public class OrderDto extends BaseEntity {
 
 	private LocalDate orderDate;

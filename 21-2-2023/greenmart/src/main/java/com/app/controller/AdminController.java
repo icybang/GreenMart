@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -110,19 +111,19 @@ public class AdminController {
 	}
 
 	// add product by id => change isAvailable = true
-	@GetMapping("/products/add={id}")
+	@PutMapping("/products/add={id}")
 	public void addProduct(@PathVariable Long id) {
 		adminService.insertProduct(id);
 	}
 
 	// update product by product id => discount only
-	@GetMapping("/products/update={id}/{disc}")
+	@PutMapping("/products/update={id}/{disc}")
 	public void updateProduct(@PathVariable Long id, @PathVariable int disc) {
 		adminService.modifyProduct(id, disc);
 	}
 
 	// delete product by id => change isAvailable = false
-	@GetMapping("/products/delete={id}")
+	@PutMapping("/products/delete={id}")
 	public void deleteProduct(@PathVariable Long id) {
 		adminService.removeProduct(id);
 	}
@@ -144,13 +145,13 @@ public class AdminController {
 	}
 
 	// add vendor => isAuthenticate=true
-	@GetMapping("/vendors/add={id}")
+	@PutMapping("/vendors/add={id}")
 	public void addVendor(@PathVariable Long id) {
 		adminService.insertVendor(id);
 	}
 
 	// delete vendor => isAuthenticate=false
-	@GetMapping("/vendors/delete={id}")
+	@PutMapping("/vendors/delete={id}")
 	public void deleteVendor(@PathVariable Long id) {
 		adminService.removeVendor(id);
 	}
@@ -268,20 +269,20 @@ public class AdminController {
 	@GetMapping("/revenue")
 	public ResponseEntity<List<VendorEarningDto>> getDailyRevenueDetails() {
 		return ResponseEntity.ok(adminService.fetchDailyVendorEarnings().stream()
-				.map(v -> new VendorEarningDto(v.getDate(), v.getAmount()*0.05)).collect(Collectors.toList()));
+				.map(v -> new VendorEarningDto(v.getDate(), v.getAmount() * 0.05)).collect(Collectors.toList()));
 	}
 
 	// get monthly revenue details of admin
 	@GetMapping("/revenue/month={num}")
 	public ResponseEntity<List<VendorEarningDto>> getMonthlyRevenueDetails(@PathVariable int num) {
 		return ResponseEntity.ok(adminService.fetchMonthlyVendorEarnings(num).stream()
-				.map(v -> new VendorEarningDto(v.getDate(), v.getAmount()*0.05)).collect(Collectors.toList()));
+				.map(v -> new VendorEarningDto(v.getDate(), v.getAmount() * 0.05)).collect(Collectors.toList()));
 	}
 
 	// get yearly revenue details of admin
 	@GetMapping("/revenue/yearly={num}")
 	public ResponseEntity<List<VendorEarningDto>> getYearlyRevenueDetails(@PathVariable int num) {
 		return ResponseEntity.ok(adminService.fetchYearlyVendorEarnings(num).stream()
-				.map(v -> new VendorEarningDto(v.getDate(), v.getAmount()*0.05)).collect(Collectors.toList()));
+				.map(v -> new VendorEarningDto(v.getDate(), v.getAmount() * 0.05)).collect(Collectors.toList()));
 	}
 }

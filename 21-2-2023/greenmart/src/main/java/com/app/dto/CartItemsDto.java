@@ -1,7 +1,10 @@
 package com.app.dto;
 
+import com.app.pojos.BaseEntity;
 import com.app.pojos.Product;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +17,8 @@ import lombok.ToString;
 @Setter
 @ToString
 @AllArgsConstructor
-public class CartItemsDto {
+@JsonInclude(Include.NON_EMPTY)
+public class CartItemsDto extends BaseEntity {
 
 	@JsonIgnoreProperties("vendor")
 	private Product product;

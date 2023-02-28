@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.app.dto.CartItemsDto;
@@ -81,6 +82,10 @@ public class CustomerServiceImpl implements CustomerService {
 	@Autowired
 	private AppUserRepo appUserRepo;
 
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+//	private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
 	@Override
 	public LoginResponse authenticateCustomer(String email, String pwd) {
 
@@ -98,6 +103,7 @@ public class CustomerServiceImpl implements CustomerService {
 		customerToBeUpdated.setEmail(customerDto.getEmail());
 		customerToBeUpdated.setAddress(customerDto.getAddress());
 		customerToBeUpdated.setMobNo(customerDto.getMobNo());
+		this.customerRepo.save(customerToBeUpdated);
 
 		return this.customerToCustomerDto(customerToBeUpdated);
 	}
@@ -107,6 +113,8 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customerToBeUpdated = this.customerRepo.findById(customerId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
 		customerToBeUpdated.setPassword(customerDto.getPassword());
+
+		this.customerRepo.save(customerToBeUpdated);
 
 	}
 
@@ -248,6 +256,7 @@ public class CustomerServiceImpl implements CustomerService {
 			CartItems cartItems = cartItemepo.findById(cartId)
 					.orElseThrow(() -> new ResourceNotFoundException("Cart", " id ", cartId));
 			cartItems.setQty(qty);
+			this.cartItemepo.save(cartItems);
 		}
 
 	}
@@ -263,10 +272,10 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
-	public List<ProductDto> getProduct(double rate) {
-		List<Product> products = this.productRepo.findByRate(rate);
-		List<ProductDto> productDtos = products.stream().map(p -> this.ProductTodto(p))
-				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
+	public List<ProductDto> getProductByRate() {
+		List<Product> products = this.productRepo.findAll();
+		List<ProductDto> productDtos = products.stream().sorted(Comparator.comparingDouble(Product::getRate).reversed())
+				.map(p -> this.ProductTodto(p)).filter(p -> p.isAvailable() == true).collect(Collectors.toList());
 		return productDtos;
 	}
 
@@ -419,12 +428,13 @@ public class CustomerServiceImpl implements CustomerService {
 		newCustomer.setAuthenticated(true);
 		newCustomer.setUserRole(Role.CUSTOMER);
 
-		String role = Role.CUSTOMER.name();
+		String role = "ROLE_CUSTOMER";
 
 		AppUser appUser = new AppUser();
 
 		appUser.setEmail(newCustomer.getEmail());
-		appUser.setPassword(newCustomer.getPassword());
+		String password = this.bCryptPasswordEncoder.encode(newCustomer.getPassword());
+		appUser.setPassword(password);
 		appUser.setRole(role);
 
 		this.appUserRepo.save(appUser);

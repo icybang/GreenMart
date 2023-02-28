@@ -126,9 +126,9 @@ public class CutomerController {
 	}
 
 	// GET - getProduct by rate
-	@GetMapping("/product/rate/{rate}")
-	public ResponseEntity<List<ProductDto>> getProductByCategory(@PathVariable double rate) {
-		return ResponseEntity.ok(this.customerService.getProduct(rate));
+	@GetMapping("/product/rate")
+	public ResponseEntity<List<ProductDto>> getProductByRate() {
+		return ResponseEntity.ok(this.customerService.getProductByRate());
 	}
 
 	// GET - getProduct by rate

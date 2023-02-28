@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,9 @@ public class VendorServiceImpl implements VendorService {
 	@Autowired
 	private AppUserRepo appUserRepo;
 
+	@Autowired
+	private BCryptPasswordEncoder bCryptPasswordEncoder;
+
 	@Override
 	public void addVendor(VendorDto venDto) {
 		Vendor vendor = modelMapper.map(venDto, Vendor.class);
@@ -60,12 +64,13 @@ public class VendorServiceImpl implements VendorService {
 				adminRepo.findById((long) 1).orElseThrow(() -> new ResourceNotFoundException("admin", " id ", 1)));
 		vendor.setUserRole(Role.VENDOR);
 		vendRepo.save(vendor);
-		String role = Role.VENDOR.name();
+		String role = "ROLE_VENDOR";
 
 		AppUser appUser = new AppUser();
 
 		appUser.setEmail(vendor.getEmail());
-		appUser.setPassword(vendor.getPassword());
+		String password = this.bCryptPasswordEncoder.encode(vendor.getPassword());
+		appUser.setPassword(password);
 		appUser.setRole(role);
 
 		this.appUserRepo.save(appUser);
@@ -180,7 +185,8 @@ public class VendorServiceImpl implements VendorService {
 	@Override
 	public void removeProduct(Long id) {
 		Product product = prodRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", " id ", id));
-		prodRepo.delete(product);
+		product.setAvailable(false);
+		this.prodRepo.save(product);
 	}
 
 	@Override

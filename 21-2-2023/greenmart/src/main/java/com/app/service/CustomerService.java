@@ -33,7 +33,7 @@ public interface CustomerService {
 
 	List<ProductDto> getProduct(Long categoryId);
 
-	List<ProductDto> getProduct(double rate);
+	List<ProductDto> getProductByRate();
 
 	List<ProductDto> getProductByName(String name);
 
