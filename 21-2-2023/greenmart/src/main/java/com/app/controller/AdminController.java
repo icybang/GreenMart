@@ -3,18 +3,16 @@ package com.app.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.dto.CustomerDto;
-import com.app.dto.LoginRequest;
 import com.app.dto.OrderDetailsDto;
 import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
@@ -34,22 +32,23 @@ public class AdminController {
 	@Autowired
 	private AdminService adminService;
 
+	@Autowired
+	private ModelMapper modelMapper;
+
 	// login method
-	@PostMapping("/login")
-	public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
-		System.out.println(request);
-		return ResponseEntity.ok(adminService.authenticateAdmin(request.getEmail(), request.getPassword()));
-	}
+//	@PostMapping("/login")
+//	public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
+//		System.out.println(request);
+//		return ResponseEntity.ok(adminService.authenticateAdmin(request.getEmail(), request.getPassword()));
+//	}
 
 	// get all not expired products (include products with quantity 0)
 	// expired = FALSE, inStock = TRUE/FALSE, isAvailable = TRUE
 	@GetMapping("/products")
 	public ResponseEntity<List<ProductDto>> getProducts() {
 		List<Product> products = adminService.fetchProducts();
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// get product by id
@@ -59,9 +58,7 @@ public class AdminController {
 		// String productName, double rate, int discount, String productDescription,
 		// String image,
 		// LocalDate expiryDate, int productQuantity, double averageRating
-		return ResponseEntity.ok(new ProductDto(product.getProductName(), product.getRate(), product.getDiscount(),
-				product.getProductDescription(), product.getImage(), product.getExpiryDate(),
-				product.getProductQuantity(), product.getAverageRating()));
+		return ResponseEntity.ok(modelMapper.map(product, ProductDto.class));
 	}
 
 	// get not expired products from specific category (include products with
@@ -70,10 +67,8 @@ public class AdminController {
 	@GetMapping("/products/category={catId}")
 	public ResponseEntity<List<ProductDto>> getProductByCategory(@PathVariable Long catId) {
 		List<Product> products = adminService.fetchProductByCategory(catId);
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// get not expired products by specific vendor (include products with quantity
@@ -82,10 +77,8 @@ public class AdminController {
 	@GetMapping("/products/vendor={venId}")
 	public ResponseEntity<List<ProductDto>> getProductByVendor(@PathVariable Long venId) {
 		List<Product> products = adminService.fetchProductByVendor(venId);
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// get not expired in stock products
@@ -93,10 +86,8 @@ public class AdminController {
 	@GetMapping("/products/new")
 	public ResponseEntity<List<ProductDto>> getNewProducts() {
 		List<Product> products = adminService.fetchNewProducts();
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// get expired products
@@ -104,10 +95,8 @@ public class AdminController {
 	@GetMapping("/products/expired")
 	public ResponseEntity<List<ProductDto>> getExpiredProducts() {
 		List<Product> products = adminService.fetchExpiredProducts();
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// add product by id => change isAvailable = true

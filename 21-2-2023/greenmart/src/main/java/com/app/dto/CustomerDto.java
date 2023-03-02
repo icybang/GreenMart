@@ -10,12 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
 @JsonInclude(Include.NON_EMPTY)
-public class CustomerDto extends BaseEntity{
+public class CustomerDto extends BaseEntity {
 	private String firstName;
 	private String lastName;
 	private String email;
@@ -42,9 +43,5 @@ public class CustomerDto extends BaseEntity{
 		this.mobNo = mobNo;
 		this.address = address;
 	}
-	    
-  
-	   
-	   
 
 }

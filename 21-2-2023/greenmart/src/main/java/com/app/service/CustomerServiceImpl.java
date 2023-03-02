@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
-import com.app.dto.LoginResponse;
 import com.app.dto.OrderDetailsDto;
 import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
@@ -86,13 +85,13 @@ public class CustomerServiceImpl implements CustomerService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 //	private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-	@Override
-	public LoginResponse authenticateCustomer(String email, String pwd) {
-
-		Customer customer = customerRepo.findByEmailAndPassword(email, pwd)
-				.orElseThrow(() -> new RuntimeException("Auth Failed"));
-		return new LoginResponse(customer.getId(), customer.getFirstName());
-	}
+//	@Override
+//	public LoginResponse authenticateCustomer(String email, String pwd) {
+//
+//		Customer customer = customerRepo.findByEmailAndPassword(email, pwd)
+//				.orElseThrow(() -> new RuntimeException("Auth Failed"));
+//		return new LoginResponse(customer.getId(), customer.getFirstName());
+//	}
 
 	@Override
 	public CustomerDto updateCustomer(CustomerDto customerDto, Long customerId) {
@@ -197,6 +196,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	private ProductDto ProductTodto(Product product) {
 		ProductDto productdto = new ProductDto();
+		productdto.setId(product.getId());
 		productdto.setProductName(product.getProductName());
 		productdto.setRate(product.getRate());
 		productdto.setDiscount(product.getDiscount());

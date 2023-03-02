@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @JsonInclude(Include.NON_EMPTY)
 public class ProductDto extends BaseEntity {
@@ -37,32 +39,5 @@ public class ProductDto extends BaseEntity {
 
 	@JsonIgnore
 	private boolean isAvailable;
-
-	public ProductDto(String productName, double rate, int discount, String productDescription, String image,
-			LocalDate expiryDate, int productQuantity, double averageRating, boolean isAvailable) {
-		super();
-		this.productName = productName;
-		this.rate = rate;
-		this.discount = discount;
-		this.productDescription = productDescription;
-		this.image = image;
-		this.expiryDate = expiryDate;
-		this.productQuantity = productQuantity;
-		this.averageRating = averageRating;
-		this.isAvailable = isAvailable;
-	}
-
-	public ProductDto(String productName, double rate, int discount, String productDescription, String image,
-			LocalDate expiryDate, int productQuantity, double averageRating) {
-		super();
-		this.productName = productName;
-		this.rate = rate;
-		this.discount = discount;
-		this.productDescription = productDescription;
-		this.image = image;
-		this.expiryDate = expiryDate;
-		this.productQuantity = productQuantity;
-		this.averageRating = averageRating;
-	}
 
 }

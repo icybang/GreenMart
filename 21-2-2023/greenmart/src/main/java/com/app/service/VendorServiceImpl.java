@@ -127,7 +127,9 @@ public class VendorServiceImpl implements VendorService {
 	public List<Product> fetchExpiredProducts(Long id) {
 		Vendor vendor = vendRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", id));
 		List<Product> products = prodRepo.findByVendor(vendor);
-		return products.stream().filter((prod) -> prod.getExpiryDate().isBefore(LocalDate.now()))
+		return products.stream()
+				.filter((prod) -> prod.getExpiryDate().isBefore(LocalDate.now())
+						|| prod.getExpiryDate().equals(LocalDate.now()))
 				.filter(p -> p.isAvailable() == false).collect(Collectors.toList());
 	}
 

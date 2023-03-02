@@ -4,14 +4,13 @@ import java.util.List;
 
 import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
-import com.app.dto.LoginResponse;
 import com.app.dto.OrderDetailsDto;
 import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
 
 public interface CustomerService {
 
-	LoginResponse authenticateCustomer(String email, String pwd);
+//	LoginResponse authenticateCustomer(String email, String pwd);
 
 	CustomerDto updateCustomer(CustomerDto customerDto, Long CustomerId);
 

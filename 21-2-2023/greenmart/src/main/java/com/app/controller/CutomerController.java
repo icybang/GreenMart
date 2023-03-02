@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.app.dto.ApiResponse;
 import com.app.dto.CartItemsDto;
 import com.app.dto.CustomerDto;
-import com.app.dto.LoginRequest;
 import com.app.dto.OrderDetailsDto;
 import com.app.dto.OrderDto;
 import com.app.dto.ProductDto;
@@ -25,6 +25,7 @@ import com.app.service.CustomerService;
 
 @RestController
 @RequestMapping("/customer")
+@CrossOrigin
 public class CutomerController {
 
 	@Autowired
@@ -34,11 +35,11 @@ public class CutomerController {
 		System.out.println("inside " + getClass().getName());
 	}
 
-	@PostMapping("/login")
-	public ResponseEntity<?> authenticateCustomer(@RequestBody LoginRequest request) {
-		System.out.println("in auth cust " + request);
-		return ResponseEntity.ok(customerService.authenticateCustomer(request.getEmail(), request.getPassword()));
-	}
+//	@PostMapping("/login")
+//	public ResponseEntity<?> authenticateCustomer(@RequestBody LoginRequest request) {
+//		System.out.println("in auth cust " + request);
+//		return ResponseEntity.ok(customerService.authenticateCustomer(request.getEmail(), request.getPassword()));
+//	}
 
 	@PostMapping("/register")
 	public ResponseEntity<ApiResponse> registerCustomer(@RequestBody CustomerDto customerDto) {

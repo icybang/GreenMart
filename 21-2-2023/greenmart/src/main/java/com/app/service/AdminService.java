@@ -2,7 +2,6 @@ package com.app.service;
 
 import java.util.List;
 
-import com.app.dto.LoginResponse;
 import com.app.pojos.Customer;
 import com.app.pojos.Order;
 import com.app.pojos.OrderDetail;
@@ -11,11 +10,11 @@ import com.app.pojos.Vendor;
 import com.app.pojos.VendorEarning;
 
 public interface AdminService {
-	
-	public LoginResponse authenticateAdmin(String email, String password);
-	
+
+//	public LoginResponse authenticateAdmin(String email, String password);
+
 	public List<Product> fetchProducts();
-	
+
 	public Product fetchProductById(Long id);
 
 	public List<Product> fetchProductByCategory(Long catId);
@@ -27,11 +26,11 @@ public interface AdminService {
 	public List<Product> fetchExpiredProducts();
 
 	public void insertProduct(Long id);
-	
+
 	public void modifyProduct(Long id, int disc);
 
 	public void removeProduct(Long id);
-	
+
 	public List<Vendor> fetchVendors();
 
 	public Vendor fetchVendorById(Long id);
@@ -72,5 +71,4 @@ public interface AdminService {
 
 	public List<VendorEarning> fetchYearlyVendorEarnings(int num);
 
-	
 }

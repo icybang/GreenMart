@@ -3,6 +3,7 @@ package com.app.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +27,9 @@ public class VendorController {
 
 	@Autowired
 	VendorService venService;
+
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@PostMapping("/register")
 	public void registerVendor(@RequestBody VendorDto venDto) {
@@ -52,10 +56,8 @@ public class VendorController {
 	@GetMapping("/products/approved/{id}")
 	public ResponseEntity<List<ProductDto>> getApprovedProducts(@PathVariable Long id) {
 		List<Product> products = venService.fetchApprovedProducts(id);
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show not approved products
@@ -63,10 +65,8 @@ public class VendorController {
 	@GetMapping("/products/not-approved/{id}")
 	public ResponseEntity<List<ProductDto>> getNotApprovedProducts(@PathVariable Long id) {
 		List<Product> products = venService.fetchNotApprovedProducts(id);
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show expired products
@@ -74,10 +74,8 @@ public class VendorController {
 	@GetMapping("/products/expired/{id}")
 	public ResponseEntity<List<ProductDto>> getExpiredProducts(@PathVariable Long id) {
 		List<Product> products = venService.fetchExpiredProducts(id);
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show approved products
@@ -85,10 +83,8 @@ public class VendorController {
 	@GetMapping("/productsbycat/{catId}/{id}")
 	public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable Long catId, @PathVariable Long id) {
 		List<Product> products = venService.fetchProductsByCategory(catId, id);
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show approved products
@@ -96,10 +92,8 @@ public class VendorController {
 	@GetMapping("/productsbyrating/{id}")
 	public ResponseEntity<List<ProductDto>> getProductsByRating(@PathVariable Long id) {
 		List<Product> products = venService.fetchProductsByRating(id);
-		return ResponseEntity.ok(products.stream()
-				.map(p -> new ProductDto(p.getProductName(), p.getRate(), p.getDiscount(), p.getProductDescription(),
-						p.getImage(), p.getExpiryDate(), p.getProductQuantity(), p.getAverageRating()))
-				.collect(Collectors.toList()));
+		return ResponseEntity.ok(
+				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// add product

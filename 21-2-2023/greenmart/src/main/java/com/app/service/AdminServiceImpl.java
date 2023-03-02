@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.app.dto.LoginResponse;
 import com.app.exceptions.ResourceNotFoundException;
-import com.app.pojos.Admin;
 import com.app.pojos.Category;
 import com.app.pojos.Customer;
 import com.app.pojos.Order;
@@ -57,16 +55,16 @@ public class AdminServiceImpl implements AdminService {
 	@Autowired
 	private VendorEarningRepository vendorEarningRepo;
 
-	@Override
-	public LoginResponse authenticateAdmin(String email, String password) {
-		Admin admin = adminRepo.findByEmailAndPassword(email, password)
-				.orElseThrow(() -> new ResourceNotFoundException("Admin", " email "));
-		if (admin.isAuthenticate() == true) {
-			return new LoginResponse(admin.getId(), admin.getFirstName());
-		} else {
-			return null;
-		}
-	}
+//	@Override
+//	public LoginResponse authenticateAdmin(String email, String password) {
+//		Admin admin = adminRepo.findByEmailAndPassword(email, password)
+//				.orElseThrow(() -> new ResourceNotFoundException("Admin", " email "));
+//		if (admin.isAuthenticate() == true) {
+//			return new LoginResponse(admin.getId(), admin.getFirstName());
+//		} else {
+//			return null;
+//		}
+//	}
 
 	@Override
 	public List<Product> fetchProducts() {
@@ -110,7 +108,8 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public List<Product> fetchExpiredProducts() {
 		List<Product> products = prodRepo.findAll();
-		return products.stream().filter(p -> p.getExpiryDate().isBefore(LocalDate.now()))
+		return products.stream()
+				.filter(p -> p.getExpiryDate().isBefore(LocalDate.now()) || p.getExpiryDate().equals(LocalDate.now()))
 				.filter(p -> p.isAvailable() == true).collect(Collectors.toList());
 	}
 
