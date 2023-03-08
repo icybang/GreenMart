@@ -105,6 +105,14 @@ public class CutomerController {
 
 	}
 
+	// PUT - remove cartItem from Cart
+	@PutMapping("/cart/{customerId}/cartItem/{cartItemId}/")
+	public ResponseEntity<ApiResponse> removeFromCart(@PathVariable Long customerId, @PathVariable Long cartItemId) {
+		this.customerService.removeCartItem(customerId, cartItemId);
+		return new ResponseEntity<ApiResponse>(new ApiResponse("cart Item removed  Successfully!!", true),
+				HttpStatus.OK);
+	}
+
 	// Get - view cart
 	@GetMapping("/cart/{customerId}")
 	public ResponseEntity<List<CartItemsDto>> showCustomerCart(@PathVariable Long customerId) {
@@ -191,5 +199,11 @@ public class CutomerController {
 	public ResponseEntity<ApiResponse> cancelOrder(@PathVariable Long customerId, @PathVariable Long orderId) {
 		this.customerService.cancelOrder(customerId, orderId);
 		return new ResponseEntity<ApiResponse>(new ApiResponse("Order cancelled  Successfully!!", true), HttpStatus.OK);
+	}
+
+	// GET - get Product by ID
+	@GetMapping("/product/prodID/{prodId}")
+	public ResponseEntity<ProductDto> getProductById(@PathVariable Long prodId) {
+		return ResponseEntity.ok(this.customerService.getProductById(prodId));
 	}
 }

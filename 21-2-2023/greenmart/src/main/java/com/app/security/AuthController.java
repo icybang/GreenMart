@@ -14,9 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.app.dto.LoginResponse;
+import com.app.pojos.Admin;
+import com.app.pojos.AppUser;
 import com.app.pojos.Credentials;
 import com.app.pojos.Customer;
+import com.app.pojos.Vendor;
+import com.app.repository.AdminRepository;
+import com.app.repository.AppUserRepo;
 import com.app.repository.CustomerRepo;
+import com.app.repository.VendorRepo;
 
 @CrossOrigin
 @RestController
@@ -25,6 +31,15 @@ public class AuthController {
 	private AuthenticationManager authManager;
 	@Autowired
 	private JwtUtil jwtUtils;
+
+	@Autowired
+	private AppUserRepo appUser;
+
+	@Autowired
+	private AdminRepository adminRepo;
+
+	@Autowired
+	private VendorRepo vendorRepo;
 
 	@Autowired
 	private CustomerRepo customerRepo;
@@ -38,11 +53,26 @@ public class AuthController {
 			auth = authManager.authenticate(auth);
 			System.out.println("AFTER: " + auth);
 			User user = (User) auth.getPrincipal();
-			Customer customer = customerRepo.findByEmail(user.getUsername())
-					.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
 			LoginResponse loginResponse = new LoginResponse();
-			loginResponse.setId(customer.getId());
-			loginResponse.setName(customer.getEmail());
+			AppUser loginUser = appUser.findByEmail(user.getUsername())
+					.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
+			if (loginUser.getRole().equals("ROLE_ADMIN")) {
+				Admin admin = adminRepo.findByEmail(user.getUsername())
+						.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
+				loginResponse.setId(loginUser.getId());
+				loginResponse.setName(loginUser.getEmail());
+			} else if (loginUser.getRole().equals("ROLE_VENDOR")) {
+				Vendor vendor = vendorRepo.findByEmail(user.getUsername())
+						.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
+				loginResponse.setId(loginUser.getId());
+				loginResponse.setName(loginUser.getEmail());
+				;
+			} else {
+				Customer customer = customerRepo.findByEmail(user.getUsername())
+						.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
+				loginResponse.setId(loginUser.getId());
+				loginResponse.setName(loginUser.getEmail());
+			}
 
 			String token = jwtUtils.generateToken(user.getUsername());
 			loginResponse.setToken(token);

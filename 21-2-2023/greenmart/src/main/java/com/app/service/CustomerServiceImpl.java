@@ -312,16 +312,73 @@ public class CustomerServiceImpl implements CustomerService {
 		this.reviewRepo.save(review);
 	}
 
+//	@Override
+//	public boolean addOrder(List<OrderDetailsDto> orderDetailDtos, Long customerId, Integer modeOfPayment) {
+//
+//		for (int i = 0; i < orderDetailDtos.size(); i++) {
+//			Long productId = orderDetailDtos.get(i).getProduct().getId();
+//			Long vendorId = orderDetailDtos.get(i).getVendor().getId();
+//			Product product = this.productRepo.findById(productId)
+//					.orElseThrow(() -> new ResourceNotFoundException("Product", " id ", productId));
+//			Vendor vendor = this.vendorRepo.findById(vendorId)
+//					.orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", vendorId));
+//			int productQuantity = product.getProductQuantity() - orderDetailDtos.get(i).getQuantity();
+//			if (productQuantity <= 0) {
+//				return false;
+//			} else {
+//				product.setProductQuantity(productQuantity);
+//				productRepo.save(product);
+//			}
+//		}
+//
+//		Customer customer = this.customerRepo.findById(customerId)
+//				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+//
+//		Order order = new Order();
+//
+//		order.setCustomer(customer);
+//		if (modeOfPayment == 0) {
+//			order.setModeOfPayment(ModeOfPayment.CASH);
+//		} else if (modeOfPayment == 1) {
+//			order.setModeOfPayment(ModeOfPayment.CREDITCARD);
+//		} else if (modeOfPayment == 2) {
+//			order.setModeOfPayment(ModeOfPayment.DEBITCARD);
+//		} else if (modeOfPayment == 3) {
+//			order.setModeOfPayment(ModeOfPayment.UPI);
+//		} else {
+//			order.setModeOfPayment(ModeOfPayment.CASH);
+//		}
+//		order.setOrderDate(LocalDate.now());
+//
+//		LocalDateTime localDatetime = LocalDateTime.now().plusHours(6);
+//		order.setDeliveryDate(localDatetime.toLocalDate());
+//
+//		order.setOrderStatus(OrderStatus.PENDING);
+//
+//		this.orderRepo.save(order);
+//
+//		for (int i = 0; i < orderDetailDtos.size(); i++) {
+//			OrderDetail orderDetails = this.orderDetailDtoToOrderDetails(orderDetailDtos.get(i));
+//			orderDetails.setOrder(order);
+//			this.orderDetailsRepo.save(orderDetails);
+//		}
+//		return true;
+//
+//	}
+
 	@Override
 	public boolean addOrder(List<OrderDetailsDto> orderDetailDtos, Long customerId, Integer modeOfPayment) {
 
 		for (int i = 0; i < orderDetailDtos.size(); i++) {
 			Long productId = orderDetailDtos.get(i).getProduct().getId();
-			Long vendorId = orderDetailDtos.get(i).getVendor().getId();
+
+//			Long vendorId = orderDetailDtos.get(i).getVendor().getId();
 			Product product = this.productRepo.findById(productId)
 					.orElseThrow(() -> new ResourceNotFoundException("Product", " id ", productId));
-			Vendor vendor = this.vendorRepo.findById(vendorId)
-					.orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", vendorId));
+
+			Vendor vendor = this.vendorRepo.findById(product.getVendor().getId())
+					.orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", product.getVendor().getId()));
+			orderDetailDtos.get(i).setVendor(vendor);
 			int productQuantity = product.getProductQuantity() - orderDetailDtos.get(i).getQuantity();
 			if (productQuantity <= 0) {
 				return false;
@@ -362,6 +419,14 @@ public class CustomerServiceImpl implements CustomerService {
 			orderDetails.setOrder(order);
 			this.orderDetailsRepo.save(orderDetails);
 		}
+		CustomerCart cart = customer.getCart();
+		List<CartItems> cartItems = this.cartItemepo.findByCart(cart);
+		for (int i = 0; i < cartItems.size(); i++) {
+			this.cartItemepo.deleteById(cartItems.get(i).getId());
+
+		}
+
+		this.cartRepo.save(cart);
 		return true;
 
 	}
@@ -397,11 +462,21 @@ public class CustomerServiceImpl implements CustomerService {
 		return orderDtos;
 	}
 
+//	@Override
+//	public List<OrderDetailsDto> getOrdersDetails(Long orderId) {
+//		Order order = this.orderRepo.findById(orderId)
+//				.orElseThrow(() -> new ResourceNotFoundException("Order", " id ", orderId));
+//		List<OrderDetail> orderDetails = this.orderDetailsRepo.findByOrder(order);
+//		List<OrderDetailsDto> orderdDetails = orderDetails.stream().map(o -> this.orderDetailToOrderDetailsDto(o))
+//				.collect(Collectors.toList());
+//		return orderdDetails;
+//	}
+
 	@Override
 	public List<OrderDetailsDto> getOrdersDetails(Long orderId) {
 		Order order = this.orderRepo.findById(orderId)
 				.orElseThrow(() -> new ResourceNotFoundException("Order", " id ", orderId));
-		List<OrderDetail> orderDetails = this.orderDetailsRepo.findByOrder(order);
+		List<OrderDetail> orderDetails = order.getOrderDetails();
 		List<OrderDetailsDto> orderdDetails = orderDetails.stream().map(o -> this.orderDetailToOrderDetailsDto(o))
 				.collect(Collectors.toList());
 		return orderdDetails;
@@ -461,6 +536,27 @@ public class CustomerServiceImpl implements CustomerService {
 		}
 		order.setOrderStatus(OrderStatus.CANCELLED);
 
+	}
+
+	@Override
+	public void removeCartItem(Long customerId, Long cartItemId) {
+		Customer customer = customerRepo.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
+		CustomerCart cart = customer.getCart();
+
+		cartItemepo.deleteById(cartItemId);
+		List<CartItems> cartItems = cart.getCartItems();
+		cart.setCartItems(cartItems);
+		cartRepo.save(cart);
+
+	}
+
+	@Override
+	public ProductDto getProductById(Long prodId) {
+		Product product = this.productRepo.findById(prodId)
+				.orElseThrow(() -> new ResourceNotFoundException("Product", " id ", prodId));
+		ProductDto productDto = this.ProductTodto(product);
+		return productDto;
 	}
 
 }

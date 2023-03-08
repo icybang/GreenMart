@@ -51,4 +51,8 @@ public interface CustomerService {
 	boolean registerCustomer(CustomerDto customerDto);
 
 	void cancelOrder(Long customerId, Long orderId);
+
+	void removeCartItem(Long customerId, Long cartItemId);
+
+	ProductDto getProductById(Long prodId);
 }

@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.app.dto.VendorEarningDto;
 import com.app.pojos.Product;
 import com.app.service.VendorService;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/vendor")
 public class VendorController {
@@ -99,6 +101,7 @@ public class VendorController {
 	// add product
 	@PostMapping("/add-product={catId}/{id}")
 	public void addProduct(@RequestBody ProductDto prodDto, @PathVariable Long catId, @PathVariable Long id) {
+		System.out.println(prodDto.getProductName());
 		venService.insertProduct(prodDto, catId, id);
 	}
 
