@@ -5,6 +5,7 @@ import java.util.List;
 import com.app.dto.ProductDto;
 import com.app.dto.VendorDto;
 import com.app.pojos.Product;
+import com.app.pojos.Vendor;
 import com.app.pojos.VendorEarning;
 
 public interface VendorService {
@@ -39,7 +40,6 @@ public interface VendorService {
 
 	public List<VendorEarning> fetchYearlyVendorEarnings(Long id, int num);
 
+	public Vendor fetchVendorById(Long id);
 
-
-	
 }

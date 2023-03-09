@@ -33,6 +33,11 @@ public class VendorController {
 	@Autowired
 	private ModelMapper modelMapper;
 
+	@GetMapping("/{id}")
+	public ResponseEntity<VendorDto> getVendorById(@PathVariable Long id) {
+		return ResponseEntity.ok(modelMapper.map(venService.fetchVendorById(id), VendorDto.class));
+	}
+
 	@PostMapping("/register")
 	public void registerVendor(@RequestBody VendorDto venDto) {
 		venService.addVendor(venDto);
@@ -58,8 +63,8 @@ public class VendorController {
 	@GetMapping("/products/approved/{id}")
 	public ResponseEntity<List<ProductDto>> getApprovedProducts(@PathVariable Long id) {
 		List<Product> products = venService.fetchApprovedProducts(id);
-		return ResponseEntity.ok(
-				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
+		return ResponseEntity
+				.ok(products.stream().map(p -> modelMapper.map(p, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show not approved products
@@ -67,8 +72,8 @@ public class VendorController {
 	@GetMapping("/products/not-approved/{id}")
 	public ResponseEntity<List<ProductDto>> getNotApprovedProducts(@PathVariable Long id) {
 		List<Product> products = venService.fetchNotApprovedProducts(id);
-		return ResponseEntity.ok(
-				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
+		return ResponseEntity
+				.ok(products.stream().map(p -> modelMapper.map(p, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show expired products
@@ -76,8 +81,8 @@ public class VendorController {
 	@GetMapping("/products/expired/{id}")
 	public ResponseEntity<List<ProductDto>> getExpiredProducts(@PathVariable Long id) {
 		List<Product> products = venService.fetchExpiredProducts(id);
-		return ResponseEntity.ok(
-				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
+		return ResponseEntity
+				.ok(products.stream().map(p -> modelMapper.map(p, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show approved products
@@ -85,8 +90,8 @@ public class VendorController {
 	@GetMapping("/productsbycat/{catId}/{id}")
 	public ResponseEntity<List<ProductDto>> getProductsByCategory(@PathVariable Long catId, @PathVariable Long id) {
 		List<Product> products = venService.fetchProductsByCategory(catId, id);
-		return ResponseEntity.ok(
-				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
+		return ResponseEntity
+				.ok(products.stream().map(p -> modelMapper.map(p, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// show approved products
@@ -94,8 +99,8 @@ public class VendorController {
 	@GetMapping("/productsbyrating/{id}")
 	public ResponseEntity<List<ProductDto>> getProductsByRating(@PathVariable Long id) {
 		List<Product> products = venService.fetchProductsByRating(id);
-		return ResponseEntity.ok(
-				products.stream().map(p -> modelMapper.map(products, ProductDto.class)).collect(Collectors.toList()));
+		return ResponseEntity
+				.ok(products.stream().map(p -> modelMapper.map(p, ProductDto.class)).collect(Collectors.toList()));
 	}
 
 	// add product

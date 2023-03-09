@@ -34,7 +34,7 @@ public class Product extends BaseEntity {
 
 	private int discount;
 
-	@Column(name = "prod_desc", length = 100)
+	@Column(name = "prod_desc", length = 200)
 	private String productDescription;
 
 	@Column(name = "is_available")

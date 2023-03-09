@@ -59,18 +59,18 @@ public class AuthController {
 			if (loginUser.getRole().equals("ROLE_ADMIN")) {
 				Admin admin = adminRepo.findByEmail(user.getUsername())
 						.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
-				loginResponse.setId(loginUser.getId());
+				loginResponse.setId(admin.getId());
 				loginResponse.setName(loginUser.getEmail());
 			} else if (loginUser.getRole().equals("ROLE_VENDOR")) {
 				Vendor vendor = vendorRepo.findByEmail(user.getUsername())
 						.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
-				loginResponse.setId(loginUser.getId());
+				loginResponse.setId(vendor.getId());
 				loginResponse.setName(loginUser.getEmail());
 				;
 			} else {
 				Customer customer = customerRepo.findByEmail(user.getUsername())
 						.orElseThrow(() -> new UsernameNotFoundException(user.getUsername()));
-				loginResponse.setId(loginUser.getId());
+				loginResponse.setId(customer.getId());
 				loginResponse.setName(loginUser.getEmail());
 			}
 

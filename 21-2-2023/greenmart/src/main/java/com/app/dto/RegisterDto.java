@@ -1,7 +1,6 @@
 package com.app.dto;
 
 import com.app.pojos.BaseEntity;
-import com.app.pojos.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,37 +16,30 @@ import lombok.ToString;
 @Setter
 @ToString
 @JsonInclude(Include.NON_EMPTY)
-public class VendorDto extends BaseEntity {
-
+public class RegisterDto extends BaseEntity {
 	private String firstName;
-
 	private String lastName;
-
 	private String email;
-
 	@JsonProperty(access = Access.WRITE_ONLY)
 	private String password;
-
 	private String mobNo;
-
 	private String address;
 
-	public VendorDto(String firstName, String lastName, String email, Role userRole, String mobNo, String address) {
-		super();
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.email = email;
-		this.mobNo = mobNo;
-		this.address = address;
-	}
-
-	public VendorDto(String firstName, String lastName, String email, String password, Role userRole, String mobNo,
-			String address) {
+	public RegisterDto(String firstName, String lastName, String email, String password, String mobNo, String address) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.password = password;
+		this.mobNo = mobNo;
+		this.address = address;
+	}
+
+	public RegisterDto(String firstName, String lastName, String email, String mobNo, String address) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
 		this.mobNo = mobNo;
 		this.address = address;
 	}

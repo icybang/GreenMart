@@ -49,8 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable().authorizeRequests().antMatchers("/admin/**").hasRole("ADMIN") // highest privilege
 				.antMatchers("/customer/**").hasRole("CUSTOMER").antMatchers("/vendor/**").hasRole("VENDOR")
-				.antMatchers("/common/**").authenticated().antMatchers("/", "/authenticate").permitAll() // lowest
-																											// privilege
+				.antMatchers("/common/**").authenticated().antMatchers("/", "/authenticate", "/register").permitAll() // lowest
+				// privilege
 //			.antMatchers("/**").permitAll()
 				.and().cors() // enable CORS i.e. allow to create "Access-Control-Allow-Origin" = "*" header
 								// by @CrossOrigin
@@ -58,4 +58,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS); // because REST services are stateless (so no
 																			// HttpSession)
 	}
+
 }

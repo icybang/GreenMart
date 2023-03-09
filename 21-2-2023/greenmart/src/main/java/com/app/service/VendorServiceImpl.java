@@ -56,6 +56,11 @@ public class VendorServiceImpl implements VendorService {
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
+	public Vendor fetchVendorById(Long id) {
+		return vendRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", id));
+	}
+
+	@Override
 	public void addVendor(VendorDto venDto) {
 		Vendor vendor = modelMapper.map(venDto, Vendor.class);
 		vendor.setAuthenticate(true);
@@ -93,6 +98,11 @@ public class VendorServiceImpl implements VendorService {
 		Vendor oldVendor = vendRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Vendor", " id ", id));
 		Vendor vendor = modelMapper.map(venDto, Vendor.class);
 		oldVendor.setPassword(vendor.getPassword());
+		AppUser appUser = appUserRepo.findByEmail(oldVendor.getEmail())
+				.orElseThrow(() -> new ResourceNotFoundException("User", " id ", id));
+		String encodedPassword = bCryptPasswordEncoder.encode(vendor.getPassword());
+		appUser.setPassword(encodedPassword);
+		appUserRepo.save(appUser);
 		vendRepo.save(oldVendor);
 	}
 

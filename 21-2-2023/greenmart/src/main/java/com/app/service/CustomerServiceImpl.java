@@ -112,7 +112,11 @@ public class CustomerServiceImpl implements CustomerService {
 		Customer customerToBeUpdated = this.customerRepo.findById(customerId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
 		customerToBeUpdated.setPassword(customerDto.getPassword());
-
+		AppUser appUser = appUserRepo.findByEmail(customerToBeUpdated.getEmail())
+				.orElseThrow(() -> new ResourceNotFoundException("User", " id ", customerId));
+		String encodedPassword = bCryptPasswordEncoder.encode(customerDto.getPassword());
+		appUser.setPassword(encodedPassword);
+		appUserRepo.save(appUser);
 		this.customerRepo.save(customerToBeUpdated);
 
 	}
@@ -213,17 +217,37 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public ProductDto addProductToCart(Long prodId, Long customerId, Integer qty) {
+		boolean allReadyInCart = false;
+		int newQuantity = 0;
 		Customer customer = this.customerRepo.findById(customerId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", " id ", customerId));
 
 		Product product = this.productRepo.findById(prodId)
 				.orElseThrow(() -> new ResourceNotFoundException("product", " id ", customerId));
 
-		CartItems cartItem = new CartItems();
-		cartItem.setProduct(product);
-		cartItem.setCart(customer.getCart());
-		cartItem.setQty(qty);
-		this.cartItemepo.save(cartItem);
+		CustomerCart cart = this.cartRepo.findByCustomer(customer);
+
+		List<CartItems> cartItems = cart.getCartItems();
+
+		for (int i = 0; i < cartItems.size(); i++) {
+			if (cartItems.get(i).getProduct().getId() == prodId) {
+				newQuantity = cartItems.get(i).getQty() + qty;
+				allReadyInCart = true;
+				cartItems.get(i).setQty(newQuantity);
+			}
+		}
+
+		if (!allReadyInCart) {
+			CartItems cartItem = new CartItems();
+			cartItem.setProduct(product);
+			cartItem.setCart(customer.getCart());
+			cartItem.setQty(qty);
+			this.cartItemepo.save(cartItem);
+		}
+		if (allReadyInCart) {
+			this.cartItemepo.saveAll(cartItems);
+		}
+
 		return this.ProductTodto(product);
 	}
 
@@ -242,6 +266,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 	private CartItemsDto cartItemsToCartItemsDto(CartItems cartItems) {
 		CartItemsDto cartItemsDto = new CartItemsDto();
+		cartItemsDto.setId(cartItems.getId());
 		cartItemsDto.setProduct(cartItems.getProduct());
 		cartItemsDto.setQty(cartItems.getQty());
 		return cartItemsDto;

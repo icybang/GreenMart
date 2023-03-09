@@ -140,7 +140,7 @@ public class CutomerController {
 		return ResponseEntity.ok(this.customerService.getProductByRate());
 	}
 
-	// GET - getProduct by rate
+	// GET - getProduct by name
 	@GetMapping("/product/name/{name}")
 	public ResponseEntity<List<ProductDto>> getProductByName(@PathVariable String name) {
 		return ResponseEntity.ok(this.customerService.getProductByName(name));
